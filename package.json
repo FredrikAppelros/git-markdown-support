@@ -1,0 +1,15 @@
+{
+  "name": "git-commit-markdown",
+  "version": "1.0.0",
+  "description": "Example of adding Markdown support to Git commit messages for a repository",
+  "scripts": {
+    "prepublish": "./configure-git",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Fredrik Appelros",
+  "license": "ISC",
+  "devDependencies": {
+    "coffee-script": "^1.9.2",
+    "marked": "^0.3.3"
+  }
+}
