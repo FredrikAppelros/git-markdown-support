@@ -1,0 +1,16 @@
+#!/usr/bin/env coffee
+
+argv = (require 'yargs').argv
+spawn = (require 'child_process').spawn
+width = process.stdout.columns
+width = Math.min width, argv.maxWidth if argv.maxWidth?
+render = (require './renderer') width
+GitCommitMessageFormatter = require './formatter'
+
+formatter = new GitCommitMessageFormatter render
+pager = spawn argv.pager
+
+process.stdin.pipe(formatter)
+formatter.pipe(pager.stdin)
+pager.stdout.pipe(process.stdout)
+process.stdin.resume()

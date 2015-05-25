@@ -1,0 +1,8 @@
+#!/bin/sh
+
+pager=${GIT_PAGER:-$(git config core.pager)}
+pager=${pager:-$PAGER}
+
+git config commit.template "./gitmessage.md"
+git config core.commentChar "%"
+git config pager.log "./messageFormatter --pager $pager --max-width 100"
