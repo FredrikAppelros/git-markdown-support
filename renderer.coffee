@@ -16,19 +16,20 @@ indent = (text, level = 1) ->
 
 class TerminalMarkdownRenderer
   constructor: (@_width) ->
+    @_listLevel = 0
     @_table = null
     @_tableHeader = []
     @_tableAlignments = []
     @_tableRow = []
 
-  _wrap: (text, margin = 4) ->
-    wrap(margin, @_width - margin) text
+  _wrap: (text, marginLeft = 4, marginRight = 4) ->
+    wrap(marginLeft, @_width - marginRight) text
 
   code: (code, lang, escaped) ->
-    "\n#{chalk.bgBlack "\n#{indent code, 2}\n"}\n"
+    "\n#{chalk.bgBlack "\n#{indent code}\n"}\n"
 
   blockquote: (quote) ->
-    "\n#{@_wrap chalk.italic("“#{quote.trim()}”"), 8}\n"
+    "\n#{@_wrap chalk.italic("“#{quote.trim()}”"), 8, 8}\n"
 
   html: (html) -> html
 
@@ -37,17 +38,29 @@ class TerminalMarkdownRenderer
 
   hr: ->  "\n#{indent _.repeat '─', @_width - 8}\n"
 
-  list: (body, ordered) ->
-    inner = ''
-    items = body.trim().split('\n')
-    for item, i in items
-      if ordered
-        inner += "\n#{i + 1}. #{item}"
-      else
-        inner += "\n• #{item}"
-    "#{@_wrap inner}\n"
+  listinit: -> @_lists.push
+    items: []
+    lists: []
 
-  listitem: (text) -> "#{text}\n"
+  list: (items, ordered) ->
+    body = ''
+    for item, i in items
+      bullet = if ordered then '•' else "#{i + 1}."
+      body += "\n#{bullet} #{item}"
+    body = "#{body}\n" unless --@_listLevel > 0
+    prevList = @_lists[@_lists.length - 2]
+    ret = body
+    if prevList?
+      prevList.lists.push
+      ret = null
+    ret
+
+  listitem: (text) ->
+    list = _.last @_lists
+    list.items.push
+      body: text
+      lists: []
+    null
 
   paragraph: (text) -> "\n#{@_wrap text}\n"
 
